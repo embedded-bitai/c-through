@@ -37,10 +37,10 @@ public class MenuRepository {
         );
         return results;
     }
-
+  
     public void create(Menu menu) throws Exception {
         log.info("Repository Menu create");
-        String query = "insert into menu(drinkName, drinkMemo, drinkType, drinkPrice, drinkImgName) values(?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, menu.getDrinkName(), menu.getDrinkMemo(), menu.getDrinkType(), menu.getDrinkPrice(), menu.getDrinkImgName());
+        String query = "insert into menu(drinkName, drinkMemo, drinkType, drinkPrice) values(?, ?, ?, ?)";
+        jdbcTemplate.update(query, menu.getDrinkName(), menu.getDrinkMemo(), menu.getDrinkType(), menu.getDrinkPrice());
     }
 }
