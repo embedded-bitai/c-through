@@ -20,4 +20,6 @@ public class MenuServiceImpl implements MenuService {
     public List<Menu> list() throws Exception {
         return repository.list();
     }
+
+
 }

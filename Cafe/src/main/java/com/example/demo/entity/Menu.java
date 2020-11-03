@@ -14,4 +14,5 @@ public class Menu {
     private String drinkType;
     private long drinkPrice;
 
+
 }
