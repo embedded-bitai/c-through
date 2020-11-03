@@ -17,10 +17,27 @@
         </p>
       </div>
       <transition name="slide-left" tag="div">
-        <div class="info" v-if="full">
+        <div class="infoTwo" v-if="full">
           <div class="text">
             <h2>Description</h2>
             <p>{{ event.description }}</p>
+            <div id="app">
+              <br><br>
+              <h1>옵션</h1>
+              <br>
+              <div>
+                <table>
+                  <tr v-for="user in users">
+                    <td>{{ user.name }}</td>
+                    <td><input type="checkbox" v-model="userIds" @click="select" :value="user.id"></td>
+                  </tr>
+                </table>
+              </div>
+              <br>
+              <h2>선택한 옵션:  {{ userIds }}</h2>
+            </div>
+            <button class="btn register" v-if="full && !hideButton" @click="onButtonClick">{{ buttonText }}</button>
+            <button class="btn save" v-if="full && !hideButton" @click="onButtonClick">{{ buttonText }}</button>
             <span v-if="event.html" v-html="event.html"></span>
           </div>
           <div class="poster">
@@ -28,7 +45,6 @@
           </div>
         </div>
       </transition>
-      <button class="btn register" v-if="full && !hideButton" @click="onButtonClick">{{ buttonText }}</button>
     </div>
   </div>
 </template>
@@ -51,6 +67,15 @@ export default {
   },
   data() {
     return {
+      users: [
+        { "id": "설탕", "name": "설탕  " },
+        { "id": "크림", "name": "크림  " },
+        { "id": "사이즈업", "name": "사이즈업" },
+      ],
+      selected: [],
+      allSelected: false,
+      userIds: [],
+
       full: false,
       hover: false
     }
@@ -77,6 +102,25 @@ export default {
     },
     onButtonClick() {
       this.$emit('buttonClicked');
+    },
+    selectAll: {
+      get: function () {
+        return this.users ? this.selected.length == this.users.length : false;
+      },
+      set: function (value) {
+        var selected = [];
+
+        if (value) {
+          this.users.forEach(function (user) {
+            selected.push(user.id);
+          });
+        }
+
+        this.selected = selected;
+      }
+    },
+    select: function() {
+      this.allSelected = false;
     }
   }
 }
@@ -234,25 +278,27 @@ export default {
 .card.full .date {
   font-size: 1.6em;
 }
-.info {
+.infoTwo {
   display: flex;
   color: white;
+  opacity: 100%;
 }
 .text {
   order: 2;
   width: 50vw;
 }
 .poster {
-  width: 40vw;
   height: fit-content;
-  border: 1px solid white;
+  border: 3px;
   margin-top: -20vh;
   margin-left: auto;
-  margin-right: 30px;
+  margin-right: 60px;
   order: 3;
 }
 .poster img {
-  width: 100%;
+  width: 500px;
+  height: 500px;
+  margin-top: 20px;
 }
 .btn {
   color: white;
@@ -290,8 +336,10 @@ export default {
   .card {
     width: 80vw;
   }
-  .info {
+  .infoTwo {
     flex-direction: column;
+    width: auto;
+    height: 400px;
   }
   .poster {
     margin: 0 auto;
