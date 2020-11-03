@@ -13,6 +13,4 @@ public class Menu {
     private String drinkMemo;
     private String drinkType;
     private long drinkPrice;
-
-
 }

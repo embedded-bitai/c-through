@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 public class MenuServiceImpl implements MenuService {
@@ -17,8 +18,20 @@ public class MenuServiceImpl implements MenuService {
     private MenuRepository repository;
 
     @Override
-    public List<Menu> list() throws Exception {
-        return repository.list();
+    public List<Menu> list(Menu menu) throws Exception {
+        return repository.list(menu);
+    }
+
+    @Override
+    public boolean create(Menu menu) throws Exception {
+        if(Pattern.matches("^(([1-9])+?)$",String.valueOf(menu.getDrinkPrice())))
+        {
+            repository.create(menu);
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
 

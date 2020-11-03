@@ -7,6 +7,7 @@ const Dashboard3 = () => import('../views/Dashboard3.vue')
 const ComingSoon = () => import('../views/ComingSoon.vue')
 const Menu = () => import('../views/Menu.vue')
 const Home = () => import('../views/Home.vue')
+const AddMenu = () => import('../views/AddMenu.vue')
 const Login = () => import('../views/register/Login.vue')
 const Register = () => import('../views/register/Register.vue')
 const FindId = () => import('../views/register/FindId.vue')
@@ -53,6 +54,12 @@ export default new Router({
             name: 'Home',
             component: Home,
         },
+        {
+            path: '/add-menu',
+            name: 'AddMenu',
+            component: AddMenu
+        },
+        ////////////////    여기부터 로그인    ////////////////
         {
             path: '/login',
             name: 'Login',
