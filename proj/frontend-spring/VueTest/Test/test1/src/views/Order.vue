@@ -43,8 +43,6 @@ export default {
         },
         { text: '닉네임', value: 'nickname' },
         { text: '수량', value: 'cafenum' },
-        { text: 'Protein (g)', value: 'protein' },
-        { text: 'Iron (%)', value: 'iron' },
       ]
     },
   },

@@ -21,10 +21,10 @@ public class RegisterReposirory {
     public void create(Register register) throws Exception {
         log.info("Repository Register Create");
         String query = "insert into register(id, pw, nn, name, em, br) values(?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(query, register.getId(), register.getPw(), register.getNn(), register.getName(), register.getEm(), register.getBr());
+        jdbcTemplate.update(query, register.getId(), register.getPw(), register.getNn(), register.getName(), register.getEm());
     }
 
-    public Boolean overlap(Register register) throws Exception {
+    public Boolean overlapID(Register register) throws Exception {
         log.info("Repository Register Overlap");
 
         List<Register> res = jdbcTemplate.query(
@@ -44,6 +44,27 @@ public class RegisterReposirory {
         return res.isEmpty() ? true : false;
     }
 
+    public Boolean overlapNN(Register register) throws Exception {
+        log.info("Repository Register Overlap");
+
+        List<Register> res = jdbcTemplate.query(
+                "select nn from register where nn = ?",
+                new RowMapper<Register>() {
+                    @Override
+                    public Register mapRow(ResultSet rs, int rowNum) throws SQLException {
+                        Register register1 = new Register();
+
+                        register1.setId(rs.getString("nn"));
+
+                        return register1;
+                    }
+                }, register.getNn()
+        );
+
+        return res.isEmpty() ? true : false;
+    }
+
+
     public Register findid(Register register) throws Exception {
         log.info("Repository Register Find Id");
 
@@ -58,7 +79,7 @@ public class RegisterReposirory {
 
                         return register1;
                     }
-                },register.getName(), register.getBr()
+                },register.getName()
         );
         return res.isEmpty() ? null : res.get(0);
     }
@@ -76,7 +97,7 @@ public class RegisterReposirory {
 
                         return register1;
                     }
-                },register.getName(), register.getId(), register.getBr()
+                },register.getName(), register.getId()
         );
 
         return res.isEmpty() ? null : res.get(0);
