@@ -1,11 +1,8 @@
 # run in command prompt (no output files)
 # python OpenCV-yolo-stream-web.py --yolo yolo-coco --url https://youtu.be/1EiC9bvVGnk
-
 # run in command prompt (with output files)
-# python OpenCV-yolo-stream-web.py --yolo yolo-coco --url https://youtu.be/1EiC9bvVGnk --output output/ouput_videosteam.avi --data output/CSV/data_videosteam.csv 
-
+# python OpenCV-yolo-stream-web.py --yolo yolo-coco --url https://youtu.be/1EiC9bvVGnk --output output/ouput_videosteam.avi --data output/CSV/data_videosteam.csv
 # JacksonHole streams https://youtu.be/RZWzyQuFxgE & https://youtu.be/1EiC9bvVGnk
-
 # import the necessary packages
 import numpy as np
 import pandas as pd
@@ -21,14 +18,11 @@ import base64
 from IPython.display import clear_output
 import imutils
 from imutils.object_detection import non_max_suppression
-
 from flask_opencv_streamer.streamer import Streamer
-
 # port stream settings
 port = 4455
 require_login = False
 streamer = Streamer(port, require_login)
-
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument("-u", "--url", required=True,
@@ -46,53 +40,46 @@ ap.add_argument("-c", "--confidence", type=float, default=0.4,
 ap.add_argument("-t", "--threshold", type=float, default=0.55,
                 help="threshold when applyong non-maxima suppression")
 args = vars(ap.parse_args())
-
 # set execution period
 period = args["period"]
-
 # load the COCO class labels our YOLO model was trained on
 labelsPath = os.path.sep.join([args["yolo"], "coco.names"])
 LABELS = open(labelsPath).read().strip().split("\n")
-
 # initialize a list of colors to represent each possible class label
 np.random.seed(42)
 COLORS = np.random.randint(0, 255, size=(len(LABELS), 3),
                            dtype="uint8")
-
 # derive the paths to the YOLO weights and model configuration
 weightsPath = os.path.sep.join([args["yolo"], "yolov3.weights"])
 configPath = os.path.sep.join([args["yolo"], "yolov3.cfg"])
-
 # load our YOLO object detector trained on COCO dataset (80 classes)
 # and determine only the *output* layer names that we need from YOLO
 print("Initializing...")
 net = cv2.dnn.readNetFromDarknet(configPath, weightsPath)
 ln = net.getLayerNames()
 ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-
 url = args["url"]
-
 vPafy = pafy.new(url)
 play = vPafy.getbest(preftype="webm")
 streams = streamlink.streams(url)
-
 # set initial parameters
 # loop over frames from the video file stream
-
 #######################################
 # In[2]:
 URL = "http://industrial.api.ubidots.com"
+URL2 = "http://localhost:1234/CVpeople"
 INDUSTRIAL_USER = True
 # TOKEN = "YOUR_TOKEN"
 TOKEN = "BBFF-ZMaRbp5wrwP7QxUEmZQd6Uz3YzA8Wr"
 DEVICE = "camera"
 VARIABLE = "people"
-
 # In[4]:
 def buildPayload(variable, value):
     return {variable: {"value": value}}
-
-
+# In[4]:
+def buildPayload2(variable, value):
+    print(variable)
+    return {"plack" : variable, "value" : value}
 # In[5]:
 def send(token, device, variable, value, industrial=True):
     # build endpoint
@@ -109,10 +96,13 @@ def send(token, device, variable, value, industrial=True):
         attempts += 1
         time.sleep(1)
     return req
-
-
+def SpSend(value, industrial=True):
+    place = "비트켐프"
+    url = URL2
+    payload = buildPayload2(place, value)
+    req = requests.post(url=url, json=payload)
+    return req
 #######################################
-
 # In[6]:
 def record(token, device, variable, sample_time=1):
     writer = None
@@ -120,8 +110,6 @@ def record(token, device, variable, sample_time=1):
     starttime = time.time()
     frame_ind = 0
     obj = np.zeros((1000, 7))
-
-
     print("recording")
     camera = cv2.VideoCapture(0)
     init = time.time()
@@ -135,16 +123,13 @@ def record(token, device, variable, sample_time=1):
         cap = cv2.VideoCapture(streams["best"].url)
         (grabbed, frame) = cap.read()
         # (grabbed, frame) = vs.read()
-
         # if the frame was not grabbed, then we have reached the end
         # of the stream
         if not grabbed:
             break
-
         # if the frame dimensions are empty, grab them
         if W is None or H is None:
             (H, W) = frame.shape[:2]
-
         # construct a blob from the input frame and then perform a forward
         # pass of the YOLO object detector, giving us our bounding boxes
         # and associated probabilities
@@ -154,13 +139,11 @@ def record(token, device, variable, sample_time=1):
         start = time.time()
         layerOutputs = net.forward(ln)
         end = time.time()
-
         # initialize our lists of detected bounding boxes, confidences,
         # and class IDs, respectively
         boxes = []
         confidences = []
         classIDs = []
-
         # loop over each of the layer outputs
         for output in layerOutputs:
             # loop over each of the detections
@@ -170,7 +153,6 @@ def record(token, device, variable, sample_time=1):
                 scores = detection[5:]
                 classID = np.argmax(scores)
                 confidence = scores[classID]
-
                 # filter out weak predictions by ensuring the detected
                 # probability is greater than the minimum probability
                 if confidence > args["confidence"]:
@@ -181,34 +163,28 @@ def record(token, device, variable, sample_time=1):
                     # height
                     box = detection[0:4] * np.array([W, H, W, H])
                     (centerX, centerY, width, height) = box.astype("int")
-
                     # use the center (x, y)-coordinates to derive the top
                     # and and left corner of the bounding box
                     x = int(centerX - (width / 2))
                     y = int(centerY - (height / 2))
-
                     # update our list of bounding box coordinates,
                     # confidences, and class IDs
                     boxes.append([x, y, int(width), int(height)])
                     confidences.append(float(confidence))
                     classIDs.append(classID)
-
         # apply non-maxima suppression to suppress weak, overlapping
         # bounding boxes
         idxs = cv2.dnn.NMSBoxes(boxes, confidences, args["confidence"],
                                 args["threshold"])
-
         # set initial objects to 0
         persons = 0
         # ensure at least one detection exists
         if len(idxs) > 0:
-
             # loop over the indexes we are keeping
             for i in idxs.flatten():
                 # extract the bounding box coordinates
                 (x, y) = (boxes[i][0], boxes[i][1])
                 (w, h) = (boxes[i][2], boxes[i][3])
-
                 # check for specific objects
                 if ("{}".format(LABELS[classIDs[i]]) == "person"):
                     # draw a bounding box rectangle and label on the frame
@@ -230,7 +206,6 @@ def record(token, device, variable, sample_time=1):
             text = "{}: {}".format(k, v)
             cv2.putText(frame, text, (10, H - ((i * 30) + 30)),
                         cv2.FONT_HERSHEY_COMPLEX, 0.8, (255, 255, 255), 2)
-
         # check if video output directory is given
         if args["output"] is not None:
             # check if the video writer is None
@@ -241,7 +216,6 @@ def record(token, device, variable, sample_time=1):
                                          (frame.shape[1], frame.shape[0]), True)
             # write the output frame to disk
             writer.write(frame)
-
         # check if data output directory is given
         if args["data"] is not None:
             # write number of detections to array
@@ -254,28 +228,22 @@ def record(token, device, variable, sample_time=1):
                 obj_df = pd.DataFrame(obj)
                 obj_df.columns = ['Frame', 'Objects', 'Persons', 'DateTime']
                 obj_df.to_csv(args["data"])
-
         # print object detection info
         print("frame: {:.0f}".format(int(frame_ind + 1)), "   datetime:", str(framedatetime))
         print("             persons: {:.0f}".format(int(persons)))
-
         # wait, if period is not over jet
         time.sleep(period - ((time.time() - starttime) % period))
         # show the output frame
         # cv2.namedWindow("Frame", cv2.WINDOW_NORMAL)
         frameR = cv2.resize(frame, (960, 540))
         # cv2.imshow("Frame", frameR)
-
         # stream to port
         streamer.update_frame(frameR)
         if not streamer.is_streaming:
             streamer.start_streaming()
         cv2.waitKey(30)
-
         frame_ind += 1
-
         key = cv2.waitKey(1) & 0xFF
-
         print("cap frames")
         ret, frame = camera.read()
         frame = imutils.resize(frame, width=min(400, frame.shape[1]))
@@ -284,14 +252,11 @@ def record(token, device, variable, sample_time=1):
         if time.time() - init >= sample_time:
             print("sending result")
             send(token, device, variable, result)
+            SpSend(result)
             init = time.time()
-
-
 # In[7]:
 def main():
     record(TOKEN, DEVICE, VARIABLE)
-
-
 # In[8]:
 if __name__ == '__main__':
     main()
