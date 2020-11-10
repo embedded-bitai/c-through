@@ -1,8 +1,0 @@
-schedule
-numpy
-argparse
-imutils
-dlib
-opencv-python
-itertools
-scipy
