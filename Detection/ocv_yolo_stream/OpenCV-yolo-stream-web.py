@@ -82,7 +82,6 @@ streams = streamlink.streams(url)
 #######################################
 # In[2]:
 URL = "http://industrial.api.ubidots.com"
-URLME = "http://localhost:1234/getpersonNum"
 INDUSTRIAL_USER = True
 # TOKEN = "YOUR_TOKEN"
 TOKEN = "BBFF-ZMaRbp5wrwP7QxUEmZQd6Uz3YzA8Wr"
@@ -110,6 +109,7 @@ def send(token, device, variable, value, industrial=True):
         attempts += 1
         time.sleep(1)
     return req
+
 
 #######################################
 
