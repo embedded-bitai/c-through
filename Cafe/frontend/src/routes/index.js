@@ -19,84 +19,11 @@ Vue.use(Router)
 
 export default new Router({
     mode: 'history',
-    routes: [{
-        path: '/dashboard1',
-        name: 'Dashboard1',
-        component: Dashboard1,
-    },
-        {
-            path: '/dashboard2',
-            name: 'Dashboard2',
-            component: Dashboard2,
-        },
-        {
-            path: '/dashboard3',
-            name: 'Dashboard3',
-            component: Dashboard3,
-        },
-        {
-            path: '/coming-soon',
-            name: 'ComingSoon',
-            component: ComingSoon,
-        },
-        {
-            path: '/Menu',
-            name: 'Menu',
-            components: {
-                default: Menu
-            },
-            props: {
-                default: true
-            }
-        },
+    routes: [
         {
             path: '/',
             name: 'Home',
             component: Home,
         },
-        {
-            path: '/add-menu',
-            name: 'AddMenu',
-            component: AddMenu
-        },
-        ////////////////    여기부터 로그인    ////////////////
-        {
-            path: '/login',
-            name: 'Login',
-            component: Login
-        },
-        {
-            path: '/register',
-            name: 'Register',
-            component: Register
-        },
-        {
-            path: '/login/findid',
-            name: 'FindId',
-            components: {
-                default: FindId
-            }
-        },
-        {
-            path: '/login/findpw',
-            name: 'FindPw',
-            component: FindPw,
-            props: true
-        },
-        {
-            path: '/login/showid',
-            name: 'ShowId',
-            components: {
-                default: ShowId
-            },
-            props: {
-                default: true
-            }
-        },
-        {
-            path: '/login/havepw',
-            name: 'HavePw',
-            component: HavePw
-        }
     ]
 })

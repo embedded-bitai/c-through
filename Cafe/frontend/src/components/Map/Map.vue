@@ -9,6 +9,10 @@ import axios from 'axios'
 export default {
   name: 'Map',
   mounted() {
+    axios.post("http://localhost:1234/sendpersonNum")
+      .then(res => {
+        res.data
+      })
     window.kakao && window.kakao.maps
         ? this.addKakaoMapScript()
         : this.initMap();
